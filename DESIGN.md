@@ -39,16 +39,17 @@ Units can be of two types:
 Segments
 ========
 
-## Grid or polygon?
+# Grid or polygon?
 
-Grid:
+## Grid:
 
 ### Awesome:
 + Easy to draw
 + Easy to fisix
 + Super easy to modify (breakage from bombs?)
 
-Polygon:
+## Polygon:
+
 ### Supercool:
 + Non-aligned modules
 + More realz!
