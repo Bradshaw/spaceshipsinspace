@@ -3,8 +3,8 @@ rkvalue = {}
 
 function rkvalue.new(n,func)
 	local self = setmetatable({},{__index=rkvalue_mt})
-	self.x = n
-	self.v = 0
+	self.val = n
+	self.deltaV = 0
 	self.func = func
 	return self
 end
@@ -15,10 +15,10 @@ end
 
 function rkvalue.eval(initial,t,dt,d,f)
 	local state = {
-		x = initial.x+d.dx*dt,
-		v = initial.v+d.dv*dt}
+		x = initial.val+d.dx*dt,
+		v = initial.deltaV+d.dv*dt}
 	local output = {
-		dx = state.v,
+		dx = state.deltaV,
 		dv = f(state,t+dt)
 	}
 	return output
@@ -33,6 +33,6 @@ function rkvalue.integrate(state, t, dt,f)
 	local dxdt = 1/6 * (a.dx + 2*(b.dx + c.dx) + d.dx)
 	local dvdt = 1/6 * (a.dv + 2*(b.dv + c.dv) + d.dv)
 
-	state.x = state.x+dxdt*dt
-	state.v = state.v+dvdt*dt
+	state.val = state.val+dxdt*dt
+	state.deltaV = state.deltaV+dvdt*dt
 end

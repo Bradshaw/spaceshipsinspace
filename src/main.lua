@@ -1,6 +1,7 @@
 function love.load(arg)
 	gstate = require "gamestate"
 	game = require("game")
+	require("useful")
 	require("rkvalue")
 	require("vector")
 	require("matrix")
