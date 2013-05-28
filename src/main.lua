@@ -1,6 +1,12 @@
 function love.load(arg)
 	gstate = require "gamestate"
 	game = require("game")
+	require("rkvalue")
+	require("vector")
+	require("matrix")
+	require("polygon")
+	require("module")
+	love.graphics.setLine(1,"rough")
 	gstate.switch(game)
 end
 
