@@ -25,3 +25,37 @@ function vector_mt:transform(mat)
 	self.X = xp
 	return self
 end
+
+function vector_mt:normalise()
+	local l = math.sqrt(self.X*self.X+self.Y*self.Y)
+	self.X = self.X/l
+	self.Y = self.Y/l
+	return self
+end
+function vector_mt:scale(a)
+	self.X = self.X*a
+	self.Y = self.Y*a
+	return self
+end
+
+function vector_mt:getNormal(vec)
+	local dx,dy = self.X-vec.X, self.Y-vec.Y
+	local n = vector.new(-dy,dx)
+	n:normalise()
+	return n
+end
+
+function vector_mt:cross(vec)
+	return  self.X*vec.Y-self.Y*vec.X
+end
+
+function vector_mt:dot(vec)
+	return self.X*vec.X+self.Y*vec.Y
+end
+
+function vector_mt:project(vec)
+	local n = vec:dup():normalise()
+	local d = self:dot(vec)
+	return n:scale(d)
+
+end

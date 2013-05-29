@@ -3,45 +3,21 @@ local state = gstate.new()
 
 function state:init()
 	p = polygon.new()
-	p:append(vector.new(-100,-100))
-	p:append(vector.new(-100,100))
-	p:append(vector.new(100,100))
-	p:append(vector.new(100,-100))
-	p:append(vector.new(-100,-100))
-	for i=1,10 do
+	for i=1,20 do
 		p:append(vector.new(math.random(-100,100),math.random(-100,100)))
 	end
-	p.transform:scale(0.5,0.5)
-	p:applyTransform()
-	p.transform:translate(512,300)
+	p:convexify()
+	p.transform:translate(2*love.graphics.getWidth()/3,2*love.graphics.getHeight()/3)
 	d = polygon.new()
-	d:append(vector.new(-15,-30))
-	d:append(vector.new(-15,30))
-	d:append(vector.new(15,30))
-	d:append(vector.new(15,-30))
-	d:append(vector.new(-15,-30))
-	for i=1,10 do
-		d:append(vector.new(math.random(-15,15),math.random(-30,30)))
+	for i=1,20 do
+		d:append(vector.new(math.random(-100,100),math.random(-100,100)))
 	end
-	d.transform:translate(65,30)
-	d:applyTransform()
-	d.transform=p.transform
-	b = polygon.new()
-	b:append(vector.new(-15,-30))
-	b:append(vector.new(-15,30))
-	b:append(vector.new(15,30))
-	b:append(vector.new(15,-30))
-	b:append(vector.new(-15,-30))
-	for i=1,10 do
-		b:append(vector.new(math.random(-15,15),math.random(-30,30)))
-	end
-	b.transform:translate(-65,30)
-	b:applyTransform()
-	b.transform=p.transform
-	rval = math.random(1,4)
-	time = 0
-	gtime = 0
+	d:convexify()
+	axis = vector.new(1,1)
+	axis:normalise()
+	sstoggle = false
 	frame = 0
+	time = 0
 end
 
 
@@ -83,6 +59,15 @@ function state:keypressed(key, uni)
 	if key=="escape" then
 		love.event.push("quit")
 	end
+	if key == " " then
+		axis = vector.new(math.random(),math.random())
+		axis:normalise()
+	end
+	if key == "p" then
+		sstoggle = true
+		frame = 0
+		time = 0
+	end
 end
 
 
@@ -92,39 +77,53 @@ end
 
 
 function state:update(dt)
-	frame = frame+1
-	gtime = gtime+1
-	time = time + dt*10
-	if time>1 then
-		time = time - math.random()*2
-		rval = math.random(1,4)
+	time = time+dt
+	frame = frame + 1
+	if sstoggle and time>=math.pi*2 then
+		sstoggle = false
 	end
-	if rval==1 then
-		p.transform:rotate(dt*1.5)
+	if love.keyboard.isDown("left") then
+		d.transform:translate(-dt*100,0)
 	end
-	if rval==2 then
-		p.transform:rotate(-dt*1.5)
+	if love.keyboard.isDown("right") then
+		d.transform:translate(dt*100,0)
 	end
-	if rval==3 then
-		p.transform:translate(0,-dt*150)
+	if love.keyboard.isDown("up") then
+		d.transform:translate(0,-dt*100)
 	end
-	if rval==4 then
-		p.transform:translate(0,dt*150)
+	if love.keyboard.isDown("down") then
+		d.transform:translate(0,dt*100)
 	end
+	p.transform:rotate(dt)
 end
 
 
 function state:draw()
-	love.graphics.setColor(useful.hsv(gtime*rval,100,100))
-	love.graphics.setLine(math.sin(rval*time)*1+2)
+	if p:collide(d) then
+		love.graphics.setColor(255,0,0)
+	else
+		love.graphics.setColor(127,127,127)
+	end
 	p:draw()
 	d:draw()
-	b:draw()
-	love.graphics.setColor(useful.hsv(gtime*rval,25,100))
-	love.graphics.setLine(math.sin(rval*time)+0.5)
-	p:draw()
-	d:draw()
-	b:draw()
+
+	--[[]]
+	if p:collideAABB(d) then
+		love.graphics.setColor(255,0,0)
+	else
+		love.graphics.setColor(127,127,127)
+	end
+	local x,y,X,Y = p:getAABB()
+	love.graphics.rectangle("line",x,y,X-x,Y-y)
+	x,y,X,Y = d:getAABB()
+	love.graphics.rectangle("line",x,y,X-x,Y-y)
+	--]]
+
+	if sstoggle then
+		local ss = love.graphics.newScreenshot()
+		ss:encode("collider"..string.format("%04d",frame)..".png")
+	end
+
 end
 
 return state
