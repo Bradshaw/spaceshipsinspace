@@ -46,6 +46,11 @@ function matrix_mt:translate(x,y)
 	self:mult(matrix.newTranslate(x,y))
 end
 
+function matrix_mt:translate_global(x,y)
+	self.mat[3] = self.mat[3]+x
+	self.mat[6] = self.mat[6]+y
+end
+
 function matrix_mt:scale(x,y)
 	self:mult(matrix.newScale(x,y))
 end

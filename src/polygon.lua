@@ -47,6 +47,10 @@ function polygon_mt:collideAABB(poly)
 end
 
 function polygon_mt:collidePoly(poly)
+	local minl = math.huge
+	local minvec = vector.new(1,0)
+	local contact = vector.new(0,0)
+	local dir = 1
 	for i=1,#self.vertices do
 		local a = self.vertices[i]:dup():transform(self.transform)
 		local j = i+1
@@ -75,6 +79,10 @@ function polygon_mt:collidePoly(poly)
 			end
 			if sm>=pM or pm>=sM then
 				return false
+			end
+			if math.min(math.abs(sm-pM),math.abs(pm-sM))<minl then
+				minvec = axis
+				minl = math.min(math.abs(sm-pM),math.abs(pm-sM))
 			end
 		end
 	end
@@ -107,9 +115,37 @@ function polygon_mt:collidePoly(poly)
 			if sm>=pM or pm>=sM then
 				return false
 			end
+			if math.min(math.abs(sm-pM),math.abs(pm-sM))<minl then
+				minvec = axis
+				minl = math.min(math.abs(sm-pM),math.abs(pm-sM))
+				dir = -1
+			end
 		end
 	end
-	return true
+	minvec:normalise()
+	minvec:scale(minl*dir)
+	local minpr = math.huge
+	if dir==1 then
+		minpr = -math.huge
+		for i,v in ipairs(poly.vertices) do
+			local pt = v:dup():transform(poly.transform)
+			local pr = pt:project(minvec)
+			if math.abs(pr:dot(minvec))>minpr then
+				contact = pt
+				minpr = math.abs(pr:dot(minvec))
+			end
+		end
+	else
+		for i,v in ipairs(self.vertices) do
+			local pt = v:dup():transform(self.transform)
+			local pr = pt:project(minvec)
+			if math.abs(pr:dot(minvec))<minpr then
+				contact = pt
+				minpr = math.abs(pr:dot(minvec))
+			end
+		end
+	end
+	return true, minvec, contact
 end
 
 function polygon_mt:collide(poly)
