@@ -61,4 +61,27 @@ function useful.hsv(H, S, V, A, div, max, ang)
 	return r, g, b, A
 end
 
+
+function useful.getABC(x1,y1,x2,y2)
+	local A = y2-y1
+	local B = x1-x2
+	local C = A*x1+B*y1
+	return A,B,C
+end
+
+function useful.lintersect(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2)
+	local a1,b1,c1 = useful.getABC(ax1,ay1,ax2,ay2)
+	local a2,b2,c2 = useful.getABC(bx1,by1,bx2,by2)
+	local det = a1*b2-a2*b1
+	if det==0 then
+		return false, 0, 0
+	else
+		local x = (b2*c1 - b1*c2)/det
+		local y = (a1*c2 - a2*c1)/det
+		return true, x, y
+	end
+
+end
+
+
 math.sign = useful.sign

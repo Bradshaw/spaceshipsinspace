@@ -6,6 +6,7 @@ function matrix.new()
 	self.mat = {1,0,0,
 				0,1,0,
 				0,0,1}
+	self.id = math.random(0,99999999)
 	return self
 end
 
@@ -33,6 +34,7 @@ function matrix.newRotate(a)
 end
 
 function matrix_mt:rotate(ang,x,y)
+	self.id = math.random(0,99999999)
 	if x and y then
 		self:mult(matrix.newTranslate(x,y))
 	end
@@ -43,15 +45,18 @@ function matrix_mt:rotate(ang,x,y)
 end
 
 function matrix_mt:translate(x,y)
+	self.id = math.random(0,99999999)
 	self:mult(matrix.newTranslate(x,y))
 end
 
 function matrix_mt:translate_global(x,y)
+	self.id = math.random(0,99999999)
 	self.mat[3] = self.mat[3]+x
 	self.mat[6] = self.mat[6]+y
 end
 
 function matrix_mt:scale(x,y)
+	self.id = math.random(0,99999999)
 	self:mult(matrix.newScale(x,y))
 end
 
@@ -71,6 +76,7 @@ end
 
 ]]
 function matrix_mt:mult(mat)
+	self.id = math.random(0,99999999)
 	self.mat = {
 	self.mat[1]*mat.mat[1] + self.mat[2]*mat.mat[4] + self.mat[3]*mat.mat[7],
 	self.mat[1]*mat.mat[2] + self.mat[2]*mat.mat[5] + self.mat[3]*mat.mat[8],

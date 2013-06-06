@@ -26,6 +26,12 @@ function vector_mt:transform(mat)
 	return self
 end
 
+function vector_mt:add(vec)
+	self.X = self.X + vec.X
+	self.Y = self.Y + vec.Y
+	return self
+end
+
 function vector_mt:normalise()
 	local l = math.sqrt(self.X*self.X+self.Y*self.Y)
 	self.X = self.X/l
@@ -36,6 +42,10 @@ function vector_mt:scale(a)
 	self.X = self.X*a
 	self.Y = self.Y*a
 	return self
+end
+
+function vector_mt:magnitude()
+	return math.sqrt(self.X*self.X+self.Y*self.Y)
 end
 
 function vector_mt:getNormal(vec)

@@ -7,10 +7,18 @@ function love.load(arg)
 	require("matrix")
 	require("polygon")
 	require("module")
+	require("dude")
+	require("bullet")
+	require("rail")
+	require("rocket")
+	require("flame")
+	require("level")
+	require("splosion")
+	--[[]
 	music = love.audio.newSource("audio/music_knives.ogg")
 	music:setLooping(true)
 	music:play()
-	love.graphics.setLine(1,"rough")
+	--]]
 	gstate.switch(game)
 end
 
@@ -46,9 +54,9 @@ end
 function keyreleased(key, uni)
 	gstate.keyreleased(key)
 end
-
+local max_dt = 1/40
 function love.update(dt)
-	gstate.update(dt)
+	gstate.update(math.min(dt,max_dt))
 end
 
 function love.draw()

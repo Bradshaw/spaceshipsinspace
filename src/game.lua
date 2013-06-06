@@ -2,13 +2,6 @@ local state = gstate.new()
 
 
 function state:init()
-	p = polygon.new()
-	for i=1,20 do
-		p:append(vector.new(math.random(-100,100),math.random(-100,100)))
-	end
-	p:convexify()
-	p.transform:translate(love.graphics.getWidth()/2,2*love.graphics.getHeight()/3)
-	spawnshape()
 	axis = vector.new(1,1)
 	axis:normalise()
 	sstoggle = false
@@ -16,6 +9,14 @@ function state:init()
 	ang = 0
 	frame = 0
 	time = 0
+	h = math.random()*360
+	for i=1,love.joystick.getNumJoysticks() do
+		dude.new(i)
+	end
+	print(love.joystick.getNumJoysticks())
+	level.new()
+	wobbles = 0
+	shake = 0
 end
 
 
@@ -52,25 +53,9 @@ function state:quit()
 	
 end
 
-function spawnshape( ... )
-	d = polygon.new()
-	for i=1,10 do
-		d:append(vector.new(math.random(-50,50),math.random(-50,50)))
-	end
-	d:convexify()
-	--d.transform = matrix.new()
-	d.transform:translate(love.graphics.getWidth()/2,-50)
-	d.transform:rotate(math.random()*math.pi*2)
-	ang=0
-	move = vector.new(0,0)
-end
-
 function state:keypressed(key, uni)
 	if key=="escape" then
 		love.event.push("quit")
-	end
-	if key == " " then
-		spawnshape()
 	end
 	if key == "p" then
 		sstoggle = true
@@ -86,58 +71,44 @@ end
 
 
 function state:update(dt)
+	h = h+dt*10
+	wobbles = wobbles + dt
+	shake = math.max(0,shake - shake*dt*10)
+	level.update(dt)
+	dude.update(dt)
+	bullet.update(dt)
+	rail.update(dt)
+	splosion.update(dt)
 	time = time+dt
 	frame = frame + 1
 	if sstoggle and time>=math.pi*2 then
 		--sstoggle = false
 	end
-	if love.keyboard.isDown("left") then
-		d.transform:translate(-dt*100,0)
-	end
-	if love.keyboard.isDown("right") then
-		d.transform:translate(dt*100,0)
-	end
-	if love.keyboard.isDown("up") then
-		d.transform:translate(0,-dt*100)
-	end
-	if love.keyboard.isDown("down") then
-		d.transform:translate(0,dt*100)
-	end
-	c,v,con = p:collide(d)
-	if c then
-		d.transform:translate_global(v.X,v.Y)
-		pvec = vector.new(-(d.transform.mat[6]-con.Y),(d.transform.mat[3]-con.X))
-		pvec:normalise()
-		ang = ang + pvec:dot(v)/30
-		move.X=(move.X+v.X/2)
-		move.Y=(move.Y+v.Y/2)
-	end
 	move.Y=move.Y+dt*10
-	d.transform:translate_global(move.X,move.Y)
-	d.transform:rotate(ang)
-	if d.transform.mat[3]<-50 or d.transform.mat[3]>love.graphics.getWidth()+50 or d.transform.mat[6]>love.graphics.getHeight()+50 then
-		spawnshape()
-	end
 end
 
 
 function state:draw()
-	p:draw()
-	d:draw()
-	love.graphics.point(p.transform.mat[3],p.transform.mat[6])
-	love.graphics.point(d.transform.mat[3],d.transform.mat[6])
-	if c then
-		--love.graphics.print(con.X.." "..con.Y,10,10)
-		--love.graphics.line(con.X,con.Y,con.X+v.X*100,con.Y+v.Y*100)
-		--love.graphics.line(con.X,con.Y,con.X-v.X*100,con.Y-v.Y*100)
-		--love.graphics.line(con.X,con.Y,con.X + pvec.X*100,con.Y+pvec.Y*100)
-	end
+	love.graphics.setBackgroundColor(useful.hsv(h,20,20))
+	love.graphics.setColor(useful.hsv(h+180,100,80))
+	love.graphics.setLine(1,"rough")
+	love.graphics.push()
+	love.graphics.translate(love.graphics.getWidth()/2,love.graphics.getHeight()/2)
+	love.graphics.translate(math.sin(wobbles*321)*2*shake,math.sin(wobbles*450)*2*shake)
+	love.graphics.rotate((math.sin(wobbles*264)/100)*shake)
+	love.graphics.translate(math.sin(wobbles*432)*2*shake,math.sin(wobbles*654)*2*shake)
+	love.graphics.translate(-love.graphics.getWidth()/2,-love.graphics.getHeight()/2)
+	level.draw()
+	dude.draw()
+	bullet.draw()
+	rail.draw()
+	splosion.draw()
 
 	if sstoggle then
 		local ss = love.graphics.newScreenshot()
 		ss:encode("collider"..string.format("%04d",frame)..".png")
 	end
-
+	love.graphics.pop()
 end
 
 return state
