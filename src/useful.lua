@@ -83,5 +83,21 @@ function useful.lintersect(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2)
 
 end
 
+function useful.alintersect(x1,y1,x2,y2,x3,y3,x4,y4)
+	local bx = x2-x1
+	local by = y2-y1
+	local dx = x4-x3
+	local dy = y4-y3
+	local b_dot_d_perp = bx*dy - by*dx
+	if b_dot_d_perp == 0 then
+		return false, 0, 0
+	else
+		local cx = x3-x1
+		local cy = y3-y1
+		local t = (cx*dy - cy*dx) / b_dot_d_perp
+		return true, x1+t*bx, y1+t*by
+	end
+end
+
 
 math.sign = useful.sign

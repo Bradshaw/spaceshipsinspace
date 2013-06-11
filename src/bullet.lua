@@ -1,6 +1,6 @@
 local bullet_mt = {}
 bullet_mt.time_out = 0.5
-bullet_mt.speed = 400
+bullet_mt.speed = 800
 
 bullet = {}
 
@@ -41,12 +41,12 @@ function bullet_mt:update( dt )
 	local thisy = self.pos.Y
 	local nextx = self.pos.X+self.dir.X*dt*self.speed
 	local nexty = self.pos.Y+self.dir.Y*dt*self.speed
+	local dist = math.huge
 	if not self.nocollide then
 		for i,v in ipairs(level) do
 			local minx,miny,maxx,maxy = v:getAABB()
 			if nextx>=minx and nextx<=maxx and nexty>=miny and nexty<=maxy then
 				local hits, axes = v:collideLine(vector.new(self.pos.X,self.pos.Y),vector.new(self.pos.X+self.dir.X,self.pos.Y+self.dir.Y))
-				local dist = math.huge
 				for i,v in ipairs(hits) do
 					if v.X>=math.min(thisx,nextx) and v.Y>=math.min(thisy,nexty) and v.X<=math.max(thisx,nextx) and v.Y<=math.max(thisy,nexty) then
 						local dx = thisx-v.X
@@ -68,6 +68,9 @@ function bullet_mt:update( dt )
 	else
 		self.pos:add(self.dir:dup():scale(self.speed*dt))
 	end
+	if not self.flame and self.useFlame then
+		flame.new(self.pos,vector.new(-self.dir.X,-self.dir.Y))
+	end
 end
 
 function bullet.draw()
@@ -77,5 +80,19 @@ function bullet.draw()
 end
 
 function bullet_mt:draw()
-	love.graphics.circle("fill",self.pos.X,self.pos.Y,3)
+	love.graphics.line(
+		self.pos.X+self.dir.Y*2,
+		self.pos.Y-self.dir.X*2,
+		self.pos.X-self.dir.Y*2,
+		self.pos.Y+self.dir.X*2)
+	love.graphics.line(
+		self.pos.X+self.dir.Y*2,
+		self.pos.Y-self.dir.X*2,
+		self.pos.X+self.dir.X*10,
+		self.pos.Y+self.dir.Y*10)
+	love.graphics.line(
+		self.pos.X-self.dir.Y*2,
+		self.pos.Y+self.dir.X*2,
+		self.pos.X+self.dir.X*10,
+		self.pos.Y+self.dir.Y*10)
 end

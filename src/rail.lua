@@ -38,7 +38,7 @@ function rail.new(pos, dir)
 	if not self.endpoint then
 		self.endpoint = vector.new(pos.X+dir.X*10000,pos.Y+dir.Y*10000)
 	end
-	splosion.new(self.endpoint.X,self.endpoint.Y,10)
+	
 
 	table.insert(rail.all, self)
 	return self

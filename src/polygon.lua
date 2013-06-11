@@ -67,7 +67,7 @@ end
 function polygon_mt:collideAABB(poly)
 	local sx,sy,sX,sY = self:getAABB()
 	local px,py,pX,pY = poly:getAABB()
-	return not (sX<px or pX<sx or sY<py or pY<sy)
+	return not (sX<=px or pX<=sx or sY<=py or pY<=sy)
 end
 
 function polygon_mt:collideLine(linestart,lineend)
@@ -81,11 +81,10 @@ function polygon_mt:collideLine(linestart,lineend)
 		end
 		local b = self:getTransed().vertices[j]
 		local axis = a:getNormal(b)
-		local h, hx, hy = useful.lintersect(linestart.X,linestart.Y,lineend.X,lineend.Y,a.X,a.Y,b.X,b.Y)
+		local h, hx, hy = useful.alintersect(linestart.X,linestart.Y,lineend.X,lineend.Y,a.X,a.Y,b.X,b.Y)
 		if h then
-			--table.insert(hits,vector.new(hx,hy))
-			--[[]]
-			if hx>math.min(a.X,b.X) and hx<math.max(a.X,b.X) and hy>math.min(a.Y,b.Y) and hy<math.max(a.Y,b.Y) then
+			---[[
+			if hx+0.001>=math.min(a.X,b.X) and hx-0.001<=math.max(a.X,b.X) and hy+0.001>=math.min(a.Y,b.Y) and hy-0.001<=math.max(a.Y,b.Y) then
 				table.insert(axes,axis)
 				table.insert(hits,vector.new(hx,hy))
 			end
@@ -174,24 +173,13 @@ function polygon_mt:collidePoly(poly)
 	minvec:normalise()
 	minvec:scale(minl*dir)
 	local minpr = math.huge
-	if dir==1 then
-		minpr = -math.huge
-		for i=1,#poly.vertices do
-			local pt = poly:getTransed().vertices[i]
-			local pr = pt:project(minvec)
-			if math.abs(pr:dot(minvec))>minpr then
-				contact = pt
-				minpr = math.abs(pr:dot(minvec))
-			end
-		end
-	else
-		for i=1,#self.vertices do
-			local pt = self:getTransed().vertices[i]
-			local pr = pt:project(minvec)
-			if math.abs(pr:dot(minvec))<minpr then
-				contact = pt
-				minpr = math.abs(pr:dot(minvec))
-			end
+	minpr = -math.huge
+	for i=1,#poly.vertices do
+		local pt = poly:getTransed().vertices[i]
+		local pr = pt:project(minvec)
+		if math.abs(pr:dot(minvec))>minpr then
+			contact = pt
+			minpr = math.abs(pr:dot(minvec))
 		end
 	end
 	return true, minvec, contact
@@ -254,6 +242,15 @@ function polygon_mt:applyTransform()
 	self.transform = matrix.new()
 end
 
+function polygon_mt:drawFill()
+	local p = {}
+	for i=1,#self.vertices do
+		local v = self:getTransed().vertices[i]
+		table.insert(p,v.X)
+		table.insert(p,v.Y)
+	end
+	love.graphics.polygon("fill",p)
+end
 function polygon_mt:draw()
 	if #self.vertices>=2 then
 
@@ -269,10 +266,12 @@ function polygon_mt:draw()
 		u = self:getTransed().vertices[1]
 		love.graphics.line(v.X,v.Y,u.X,u.Y)
 	end
-	--[[]
-	local norms = self:getNormals()
-	for i,v in ipairs(norms) do
-		love.graphics.line(v.pos.X,v.pos.Y,v.pos.X+v.nor.X*10,v.pos.Y+v.nor.Y*10)
+	---[[
+	if self.drawNorms then
+		local norms = self:getNormals()
+		for i,v in ipairs(norms) do
+			love.graphics.line(v.pos.X,v.pos.Y,v.pos.X+v.nor.X*10,v.pos.Y+v.nor.Y*10)
+		end
 	end
 	--]]
 end

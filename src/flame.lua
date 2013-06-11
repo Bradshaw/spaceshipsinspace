@@ -5,6 +5,7 @@ function flame.new(pos, dir, spread)
 	dir = dir:dup():transform(matrix.newRotate((math.random()-0.5)*spread))
 	local self = bullet.new(pos,dir)
 	self.time_out = math.random()/3
+	self.flame = true
 	self.rad = math.random(10,20)
 	self.speed = math.random(0,350)
 	self.nocollide = true

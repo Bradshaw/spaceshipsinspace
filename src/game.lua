@@ -58,7 +58,7 @@ function state:keypressed(key, uni)
 		love.event.push("quit")
 	end
 	if key == "p" then
-		sstoggle = true
+		sstoggle = not sstoggle
 		frame = 0
 		time = 0
 	end
@@ -81,23 +81,22 @@ function state:update(dt)
 	splosion.update(dt)
 	time = time+dt
 	frame = frame + 1
-	if sstoggle and time>=math.pi*2 then
-		--sstoggle = false
-	end
 	move.Y=move.Y+dt*10
 end
 
 
 function state:draw()
-	love.graphics.setBackgroundColor(useful.hsv(h,20,20))
-	love.graphics.setColor(useful.hsv(h+180,100,80))
+	love.graphics.setBackgroundColor(useful.hsv(h,15,20))
+	love.graphics.setColor(useful.hsv(h+180,15,80))
 	love.graphics.setLine(1,"rough")
 	love.graphics.push()
+	--shake = 0
 	love.graphics.translate(love.graphics.getWidth()/2,love.graphics.getHeight()/2)
 	love.graphics.translate(math.sin(wobbles*321)*2*shake,math.sin(wobbles*450)*2*shake)
 	love.graphics.rotate((math.sin(wobbles*264)/100)*shake)
 	love.graphics.translate(math.sin(wobbles*432)*2*shake,math.sin(wobbles*654)*2*shake)
 	love.graphics.translate(-love.graphics.getWidth()/2,-love.graphics.getHeight()/2)
+	--love.graphics.translate(-dude.all[1].pos.X,-dude.all[1].pos.Y)
 	level.draw()
 	dude.draw()
 	bullet.draw()
@@ -106,9 +105,10 @@ function state:draw()
 
 	if sstoggle then
 		local ss = love.graphics.newScreenshot()
-		ss:encode("collider"..string.format("%04d",frame)..".png")
+		ss:encode("movement"..string.format("%04d",frame)..".png")
 	end
 	love.graphics.pop()
+	love.graphics.print(love.timer.getFPS(),10,10)
 end
 
 return state

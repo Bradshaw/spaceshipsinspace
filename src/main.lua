@@ -19,6 +19,15 @@ function love.load(arg)
 	music:setLooping(true)
 	music:play()
 	--]]
+	for i=1,love.joystick.getNumJoysticks() do
+		print(love.joystick.getName(i),
+			love.joystick.getNumAxes(i),
+			love.joystick.getNumBalls(i),
+			love.joystick.getNumButtons(i),
+			love.joystick.getNumHats(i)
+			)
+
+	end
 	gstate.switch(game)
 end
 
